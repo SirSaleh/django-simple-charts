@@ -89,3 +89,40 @@ class Chart(object):
             return float(obj)
         except ValueError:
             return None
+
+
+
+class QuantitativeChart(Chart):
+
+    @staticmethod
+    def _try_get_nested_value_from_dictionary(dictionary, *ordered_keys):
+        """
+        Get nested key from dictionary or return none
+        :param dictionary:
+        :param args: ordered keys
+        :return:
+        """
+        if ordered_keys:
+            value = dictionary
+            try:
+                for key in ordered_keys:
+                    value = value[key]
+            except KeyError:
+                value = None
+            return value
+
+    def complete_quantitative_attrs(self):
+        """
+        Complete Attributes with None Value to default based queryset selected columns.
+        :return: self histogram object
+        """
+        if self.data_dictionary:
+            x_min_list = [min(self._try_get_nested_value_from_dictionary(self.data_dictionary, x, 'data')) for x in
+                          self.columns]
+            if not self.min_x:
+                self.min_x = min(x_min_list)
+            x_max_list = [max(self._try_get_nested_value_from_dictionary(self.data_dictionary, x, 'data')) for x in
+                          self.columns]
+            if not self.max_x:
+                self.max_x = max(x_max_list)
+
