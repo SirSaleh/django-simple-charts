@@ -1,5 +1,6 @@
 import math
 
+
 class Chart(object):
     """
     Main Object for django simple charts
@@ -13,10 +14,13 @@ class Chart(object):
     y_step = None
     x_number_step = None
     y_number_step = None
-    min_x = None
-    max_x = None
+    min_x_value = None
+    max_x_value = None
+
     min_y = None
     max_y = None
+
+    svg_width = 400
 
     def __init__(self):
         pass
@@ -52,12 +56,12 @@ class Chart(object):
         self.y_number_step = y_number_step
         return self
 
-    def set_min_x(self, min_x):
-        self.min_x = min_x
+    def set_min_x_value(self, min_x):
+        self.min_x_value = min_x
         return self
 
-    def set_max_x(self, max_x):
-        self.max_x = max_x
+    def set_max_x_value(self, max_x):
+        self.max_x_value = max_x
         return self
 
     def set_min_y(self, min_y):
@@ -118,12 +122,12 @@ class QuantitativeChart(Chart):
         if self.data_dictionary:
             x_min_list = [min(self._try_get_nested_value_from_dictionary(self.data_dictionary, x, 'data')) for x in
                           self.columns]
-            if not self.min_x:
-                self.min_x = min(x_min_list)
+            if not self.min_x_value:
+                self.min_x_value = min(x_min_list)
             x_max_list = [max(self._try_get_nested_value_from_dictionary(self.data_dictionary, x, 'data')) for x in
                           self.columns]
-            if not self.max_x:
-                self.max_x = max(x_max_list)
+            if not self.max_x_value:
+                self.max_x_value = max(x_max_list)
 
 
 class Histogram(QuantitativeChart):
@@ -199,7 +203,7 @@ class Histogram(QuantitativeChart):
         data = self._try_get_nested_value_from_dictionary(self.data_dictionary, column, 'data')
         if data:
             for bin_index in range(self.breaks):
-                min_bin = self.min_x + bin_index * self.bins_width
+                min_bin = self.min_x_value + bin_index * self.bins_width
                 max_bin = min_bin + self.bins_width
                 histogram_column.append({'min': min_bin, 'max': max_bin,
                                          'count': self._count_data_in_range(data, min_bin, max_bin)})
@@ -211,7 +215,7 @@ class Histogram(QuantitativeChart):
         Complete histogram specific attributes
         :return:
         """
-        range_of_date = self.max_x - self.min_x
+        range_of_date = self.max_x_value - self.min_x_value
 
         if not self.breaks:
             aggregated_data = self._get_aggregated_data()
@@ -223,3 +227,54 @@ class Histogram(QuantitativeChart):
 
         for column in self.columns:
             self._histogram_dictionary[column] = self._get_histogram_dictionary_for_column(column)
+
+        self.min_y = 0
+        if not self.max_y:
+            self.max_y = 400
+
+    def html_svg(self):
+        """
+        Create HTML <svg> Tag Output for SVG Image.
+        :return:
+        """
+        self.complete_quantitative_attrs()
+        self.complete_histogram_attrs()
+
+        all_counts = [
+            self._try_get_nested_value_from_dictionary(self._histogram_dictionary, self.columns[0], x, 'count') for x in
+            range(self.breaks)]
+        max_count = max(all_counts)
+        if max_count:
+            count_coefficient = self.max_y / max_count
+        else:
+            count_coefficient = 0
+
+        x_axis_real_range = self.max_x_value - self.min_x_value
+        x_axis_coefficient = self.svg_width / x_axis_real_range
+
+        svg_string = '<svg width="%f" height="%f" aria-labelledby="title desc" role="img">' % (
+            self.svg_width + 100, self.max_y + 50)
+        if self.axis:
+            svg_string += '<line x1="0" y1="%f" x2="%f" y2="%f" style="stroke:rgb(0,0,0); stroke-width:2" />' % (
+                self.max_y, self.max_x_value * x_axis_coefficient, self.max_y)
+        for bin_index in range(self.breaks):
+            bin_count = self._try_get_nested_value_from_dictionary(self._histogram_dictionary, self.columns[0],
+                                                                   bin_index,
+                                                                   'count')
+            min_bin_x_value = self._try_get_nested_value_from_dictionary(self._histogram_dictionary, self.columns[0],
+                                                                         bin_index,
+                                                                         'min')
+            svg_string += '''
+                <g>
+                    <rect width="%f" height="%f" x="%f" y="%f"></rect>
+                    <text x="%f" y="%f">%s</text>
+                    <text x="%f" y="%f">%s</text>
+                </g>
+            ''' % (x_axis_coefficient * self.bins_width, count_coefficient * bin_count,
+                   x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50,
+                   self.max_y - count_coefficient * bin_count,
+                   x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50, 422, str(round(min_bin_x_value, 1)),
+                   x_axis_coefficient * self.min_x_value,
+                   self.max_y - count_coefficient * bin_count, str(round(bin_count, 1)))
+        svg_string += "</svg>"
+        return svg_string
