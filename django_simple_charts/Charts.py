@@ -215,15 +215,15 @@ class Histogram(QuantitativeChart):
         Complete histogram specific attributes
         :return:
         """
-        range_of_date = self.max_x_value - self.min_x_value
+        range_of_data = self.max_x_value - self.min_x_value
 
         if not self.breaks:
             aggregated_data = self._get_aggregated_data()
             if self._get_default_histogram_width(aggregated_data):
                 self.bins_width = self._get_default_histogram_width(aggregated_data)
-                self.breaks = math.ceil(range_of_date / self.bins_width)
+                self.breaks = math.ceil(range_of_data / self.bins_width)
         else:
-            self.bins_width = math.ceil(range_of_date / self.breaks)
+            self.bins_width = math.ceil(range_of_data / self.breaks)
 
         for column in self.columns:
             self._histogram_dictionary[column] = self._get_histogram_dictionary_for_column(column)
