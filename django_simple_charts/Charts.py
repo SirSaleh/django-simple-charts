@@ -249,8 +249,7 @@ class Histogram(QuantitativeChart):
         else:
             count_coefficient = 0
 
-        x_axis_real_range = self.max_x_value - self.min_x_value
-        x_axis_coefficient = self.svg_width / x_axis_real_range
+        x_axis_coefficient = self.svg_width / (self.max_x_value - self.min_x_value)
 
         svg_string = '<svg width="%f" height="%f" aria-labelledby="title desc" role="img">' % (
             self.svg_width + 100, self.max_y + 50)
