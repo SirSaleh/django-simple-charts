@@ -1,6 +1,7 @@
 import math
 from django.utils.html import format_html
 
+
 class Chart(object):
     """
     Main Object for django simple charts
@@ -141,6 +142,10 @@ class Histogram(QuantitativeChart):
 
     def __init__(self):
         super().__init__()
+
+    def set_breaks(self, breaks):
+        self.breaks = breaks
+        return self
 
     @staticmethod
     def _get_quantile(data, r):
