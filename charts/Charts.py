@@ -28,6 +28,7 @@ class Chart(object):
 
     def set_columns(self, columns):
         self.columns = columns
+        return self
 
     def set_x_label(self, x_label):
         self.x_label = x_label
@@ -140,8 +141,9 @@ class Histogram(QuantitativeChart):
     bins_width = None
     _histogram_dictionary = dict()
 
-    def __init__(self):
+    def __init__(self, data_dictionary):
         super().__init__()
+        self.data_dictionary = data_dictionary
 
     def set_breaks(self, breaks):
         self.breaks = breaks
