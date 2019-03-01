@@ -1,5 +1,5 @@
 import math
-
+from django.utils.html import format_html
 
 class Chart(object):
     """
@@ -276,4 +276,4 @@ class Histogram(QuantitativeChart):
                    x_axis_coefficient * self.min_x_value,
                    self.max_y - count_coefficient * bin_count, str(round(bin_count, 1)))
         svg_string += "</svg>"
-        return svg_string
+        return format_html(svg_string)
