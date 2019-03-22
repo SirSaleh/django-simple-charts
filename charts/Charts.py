@@ -273,14 +273,10 @@ class Histogram(QuantitativeChart):
             svg_string += '''
                 <g>
                     <rect width="%f" height="%f" x="%f" y="%f"></rect>
-                    <text x="%f" y="%f">%s</text>
-                    <text x="%f" y="%f">%s</text>
                 </g>
             ''' % (x_axis_coefficient * self.bins_width, count_coefficient * bin_count,
                    x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50,
-                   self.max_y - count_coefficient * bin_count,
-                   x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50, 422, str(round(min_bin_x_value, 1)),
-                   x_axis_coefficient * self.min_x_value,
-                   self.max_y - count_coefficient * bin_count, str(round(bin_count, 1)))
+                   self.max_y - count_coefficient * bin_count,)
+
         svg_string += "</svg>"
         return format_html(svg_string)
