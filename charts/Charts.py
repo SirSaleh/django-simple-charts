@@ -263,6 +263,8 @@ class Histogram(QuantitativeChart):
         if self.axis:
             svg_string += '<line x1="0" y1="%f" x2="%f" y2="%f" style="stroke:rgb(0,0,0); stroke-width:2" />' % (
                 self.max_y, self.max_x_value * x_axis_coefficient, self.max_y)
+            svg_string += '<line x1="0" y1="%f" x2="0" y2="0" style="stroke:rgb(0,0,0); stroke-width:2" />' % (
+                self.max_y)
         for bin_index in range(self.breaks):
             bin_count = self._try_get_nested_value_from_dictionary(self._histogram_dictionary, self.columns[0],
                                                                    bin_index,
