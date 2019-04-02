@@ -270,6 +270,10 @@ class Histogram(QuantitativeChart):
             min_bin_x_value = self._try_get_nested_value_from_dictionary(self._histogram_dictionary, self.columns[0],
                                                                          bin_index,
                                                                          'min')
+
+            bin_label_x_position = x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50
+            x_labels_height = 405
+
             svg_string += '''
                 <g>
                     <rect width="%f" height="%f" x="%f" y="%f"></rect>
@@ -278,8 +282,8 @@ class Histogram(QuantitativeChart):
             ''' % (x_axis_coefficient * self.bins_width, count_coefficient * bin_count,
                    x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50,
                    self.max_y - count_coefficient * bin_count,
-                   x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50, 405,
-                   x_axis_coefficient * (min_bin_x_value - self.min_x_value) + 50, 405,
+                   bin_label_x_position, x_labels_height,
+                   bin_label_x_position, x_labels_height,
                    str(round(min_bin_x_value, 1)),
                    )
 
